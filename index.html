@@ -297,18 +297,54 @@
     100% { transform: scaleY(1) scaleX(1); filter: brightness(1); }
   }
 
-  /* Mobile tap instruction */
-  .tap-hint {
+  /* Play button overlay for mobile */
+  .play-overlay {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 5;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 6;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .play-overlay.hidden { display: none; }
+
+  .play-icon {
+    width: 70px; height: 70px;
+    border: 3px solid rgba(255,255,255,0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .play-overlay:active .play-icon {
+    transform: scale(0.9);
+    border-color: #ff1a1a;
+  }
+
+  .play-icon svg { margin-left: 4px; }
+
+  .play-text {
     font-family: 'VT323', monospace;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: rgba(255,255,255,0.6);
-    text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    pointer-events: none;
-    display: none;
+    letter-spacing: 0.15em;
+  }
+
+  /* YT player div */
+  #ytplayer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
   }
 
   @media (max-width: 700px) {
@@ -317,7 +353,6 @@
     .screen-container { width: 85vw; }
     .remote { gap: 5px; }
     .btn { font-size: 0.95rem; padding: 8px 12px; }
-    .tap-hint { display: block; }
   }
 
   @media (max-width: 400px) {
@@ -335,6 +370,7 @@
   <div class="tv-cabinet">
     <div class="tv-bezel">
       <div class="screen-container" id="screen">
+        <div id="ytplayer"></div>
         <div class="flash" id="flash"></div>
         <div class="crt-overlay"></div>
         <div class="scanlines"></div>
@@ -347,7 +383,12 @@
           <div class="np-title" id="npTitle">-</div>
           <div class="np-sub">CORTNEYHELL.TV</div>
         </div>
-        <div class="tap-hint" id="tapHint">TAP TO START</div>
+        <div class="play-overlay" id="playOverlay">
+          <div class="play-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+          <div class="play-text">TAP TO TUNE IN</div>
+        </div>
       </div>
     </div>
     <div class="tv-controls">
@@ -375,188 +416,211 @@
   <a href="https://instagram.com/cortneyhell" target="_blank">@cortneyhell</a>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-(function() {
-  var musicVids = [
-    { id: '3QLqlImJutc', t: 'idioteque' },
-    { id: '6tWwB4nBRbE', t: 'i just need enough' },
-    { id: 'TDdOjHu6UNs', t: 'ice cold' },
-    { id: '9MwEilCe6-k', t: 'make it forever' },
-    { id: 'Ev76E9wqSUo', t: 'hanging like a pendant' },
-    { id: 'izh4gmi9oko', t: 'weekend fever' },
-    { id: 'My2f81pM3ok', t: 'sweep away my shadow' },
-    { id: 'Log8nwiSspk', t: 'strange' },
-    { id: 'VAli6pkEuiE', t: 'this bliss' },
-    { id: '7UQaotJHFr4', t: 'plowed' },
-    { id: 'K3y_6_r5Bgs', t: 'what you got' },
-    { id: '8FhqWcP0hgo', t: 'low' },
-    { id: 'LpHQeUjEhvw', t: 'Tombstone - Charlatan' },
-    { id: 'fNSMhsoo6S4', t: 'Twin Stacks - The Hurt' },
-    { id: 'vy_Ubw8kn3Y', t: 'Hushhh - In My Head' },
-    { id: 'tf6-_u_kVhI', t: 'LETHAL METHOD - C.L.Y.D.' },
-    { id: 'QogDZdzpfP0', t: 'Gorge - Soul Servant' },
-    { id: 'AmGthVkxlhc', t: 'FRENZY - STRENGTH TO SURVIVE' },
-    { id: 's5gIP14yGCc', t: 'LETHAL METHOD - Found Sounds Sessions' },
-    { id: '8vK0PXALZhI', t: "Dallas Murrae - I Don't Smoke" }
-  ];
+var musicVids = [
+  { id: '3QLqlImJutc', t: 'idioteque' },
+  { id: '6tWwB4nBRbE', t: 'i just need enough' },
+  { id: 'TDdOjHu6UNs', t: 'ice cold' },
+  { id: '9MwEilCe6-k', t: 'make it forever' },
+  { id: 'Ev76E9wqSUo', t: 'hanging like a pendant' },
+  { id: 'izh4gmi9oko', t: 'weekend fever' },
+  { id: 'My2f81pM3ok', t: 'sweep away my shadow' },
+  { id: 'Log8nwiSspk', t: 'strange' },
+  { id: 'VAli6pkEuiE', t: 'this bliss' },
+  { id: '7UQaotJHFr4', t: 'plowed' },
+  { id: 'K3y_6_r5Bgs', t: 'what you got' },
+  { id: '8FhqWcP0hgo', t: 'low' },
+  { id: 'LpHQeUjEhvw', t: 'Tombstone - Charlatan' },
+  { id: 'fNSMhsoo6S4', t: 'Twin Stacks - The Hurt' },
+  { id: 'vy_Ubw8kn3Y', t: 'Hushhh - In My Head' },
+  { id: 'tf6-_u_kVhI', t: 'LETHAL METHOD - C.L.Y.D.' },
+  { id: 'QogDZdzpfP0', t: 'Gorge - Soul Servant' },
+  { id: 'AmGthVkxlhc', t: 'FRENZY - STRENGTH TO SURVIVE' },
+  { id: 's5gIP14yGCc', t: 'LETHAL METHOD - Found Sounds Sessions' },
+  { id: '8vK0PXALZhI', t: "Dallas Murrae - I Don't Smoke" }
+];
 
-  var liveVids = [
-    { id: '4iWGxePe2NA', t: 'Keep the Piece @ Arcane Workshop 3.7.26' },
-    { id: 'erUODxg8MMA', t: 'Twin Stacks @ The End 3.1.26' },
-    { id: 'qUOs3Z9fs-s', t: 'Gorge @ Arcane Workshop 2.25.26' },
-    { id: 'Bu5j1aQ4Ef0', t: 'Joint Funeral @ Inglewood Lounge 2.16.26' },
-    { id: 'vPRae0PQXYU', t: 'Aim Down Sight @ Tempo 2.12.26' },
-    { id: 'LoTFRJT5K28', t: 'On The Brink @ Tempo 2.12.26' },
-    { id: 'JkeNIDGbY-E', t: 'Dogpile @ Tempo 2.12.26' },
-    { id: 'DoOQXBTMJJo', t: 'Lethal Method @ drkmttr 2.11.26' },
-    { id: 'CuYYoeYlTkk', t: 'Gorge @ Vinyl Lounge 2.7.26' },
-    { id: 'XlDJ7waGSz8', t: 'Die Trying @ drkmttr 2.6.26' },
-    { id: 'c7554e-6Mb8', t: "Finda Brita @ Mean Mel's, Cookeville 1.30.26" },
-    { id: 'sb7rnjRN11o', t: 'Gorge @ Tempo 2.1.26' },
-    { id: 'ui8kzz2tsfc', t: 'Grow Blind @ Fuchsia Fest 2024' },
-    { id: 'vF5BGMDSIVo', t: 'Fuchsia Fest 2024' },
-    { id: 'Wc8bc2zCr3s', t: 'Gorge @ Eastside Bowl 12.13.25' },
-    { id: 'Nvyj1OPNoe4', t: 'Better Off @ The End 12.2.23' },
-    { id: 'YI8X5uC8ahs', t: 'Lethal Method @ Vinyl Lounge 10.25.25' },
-    { id: 'Q-ufICWUZv0', t: 'Twin Stacks @ Arcane Workshop 9.15.24' },
-    { id: 'ikxVoh8i8Ko', t: 'Orthodox @ The Basement 6.20.25' },
-    { id: 'gWmQ9sLVOao', t: 'Idiot @ Arcane Workshop 4.11.24' },
-    { id: 'XKl-r_H8ePk', t: 'Blemish @ Arcane Workshop 11.30.25' },
-    { id: 'aZYJ_qXDs78', t: 'Hushhh @ The Cowan 1.11.24' },
-    { id: '-b6Ju8Z2wr8', t: 'Better Off @ The End 6.22.24' },
-    { id: 'CxaCNZtBsZw', t: 'On The Brink @ Arcane Workshop 7.12.25' },
-    { id: 'UjnUp4obxXE', t: 'Lethal Method @ The End 12.17.23' },
-    { id: 'hwX-5XjiPLA', t: 'Thirty Nights @ drkmttr 3.31.24' }
-  ];
+var liveVids = [
+  { id: '4iWGxePe2NA', t: 'Keep the Piece @ Arcane Workshop 3.7.26' },
+  { id: 'erUODxg8MMA', t: 'Twin Stacks @ The End 3.1.26' },
+  { id: 'qUOs3Z9fs-s', t: 'Gorge @ Arcane Workshop 2.25.26' },
+  { id: 'Bu5j1aQ4Ef0', t: 'Joint Funeral @ Inglewood Lounge 2.16.26' },
+  { id: 'vPRae0PQXYU', t: 'Aim Down Sight @ Tempo 2.12.26' },
+  { id: 'LoTFRJT5K28', t: 'On The Brink @ Tempo 2.12.26' },
+  { id: 'JkeNIDGbY-E', t: 'Dogpile @ Tempo 2.12.26' },
+  { id: 'DoOQXBTMJJo', t: 'Lethal Method @ drkmttr 2.11.26' },
+  { id: 'CuYYoeYlTkk', t: 'Gorge @ Vinyl Lounge 2.7.26' },
+  { id: 'XlDJ7waGSz8', t: 'Die Trying @ drkmttr 2.6.26' },
+  { id: 'c7554e-6Mb8', t: "Finda Brita @ Mean Mel's, Cookeville 1.30.26" },
+  { id: 'sb7rnjRN11o', t: 'Gorge @ Tempo 2.1.26' },
+  { id: 'ui8kzz2tsfc', t: 'Grow Blind @ Fuchsia Fest 2024' },
+  { id: 'vF5BGMDSIVo', t: 'Fuchsia Fest 2024' },
+  { id: 'Wc8bc2zCr3s', t: 'Gorge @ Eastside Bowl 12.13.25' },
+  { id: 'Nvyj1OPNoe4', t: 'Better Off @ The End 12.2.23' },
+  { id: 'YI8X5uC8ahs', t: 'Lethal Method @ Vinyl Lounge 10.25.25' },
+  { id: 'Q-ufICWUZv0', t: 'Twin Stacks @ Arcane Workshop 9.15.24' },
+  { id: 'ikxVoh8i8Ko', t: 'Orthodox @ The Basement 6.20.25' },
+  { id: 'gWmQ9sLVOao', t: 'Idiot @ Arcane Workshop 4.11.24' },
+  { id: 'XKl-r_H8ePk', t: 'Blemish @ Arcane Workshop 11.30.25' },
+  { id: 'aZYJ_qXDs78', t: 'Hushhh @ The Cowan 1.11.24' },
+  { id: '-b6Ju8Z2wr8', t: 'Better Off @ The End 6.22.24' },
+  { id: 'CxaCNZtBsZw', t: 'On The Brink @ Arcane Workshop 7.12.25' },
+  { id: 'UjnUp4obxXE', t: 'Lethal Method @ The End 12.17.23' },
+  { id: 'hwX-5XjiPLA', t: 'Thirty Nights @ drkmttr 3.31.24' }
+];
 
-  var cat = 'all';
-  var shuf = true;
-  var list = [];
-  var idx = 0;
-  var chTimer = null;
-  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  var userTapped = false;
+var cat = 'all';
+var shuf = true;
+var list = [];
+var idx = 0;
+var chTimer = null;
+var player = null;
+var playerReady = false;
+var started = false;
 
-  function shuffle(arr) {
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-    }
-    return a;
+function shuffleArr(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
   }
+  return a;
+}
 
-  function buildList() {
-    var src;
-    if (cat === 'music') src = musicVids.slice();
-    else if (cat === 'live') src = liveVids.slice();
-    else src = musicVids.concat(liveVids);
-    list = shuf ? shuffle(src) : src;
-  }
+function buildList() {
+  var src;
+  if (cat === 'music') src = musicVids.slice();
+  else if (cat === 'live') src = liveVids.slice();
+  else src = musicVids.concat(liveVids);
+  list = shuf ? shuffleArr(src) : src;
+}
 
-  function doFlash() {
-    var el = document.getElementById('flash');
-    el.classList.remove('go');
-    void el.offsetWidth;
-    el.classList.add('go');
-  }
+function doFlash() {
+  var el = document.getElementById('flash');
+  el.classList.remove('go');
+  void el.offsetWidth;
+  el.classList.add('go');
+}
 
-  function showCh() {
-    var d = document.getElementById('chDisp');
-    document.getElementById('chNum').textContent = String(idx + 1).padStart(2, '0');
-    d.classList.add('show');
-    clearTimeout(chTimer);
-    chTimer = setTimeout(function() { d.classList.remove('show'); }, 3000);
-  }
+function showCh() {
+  var d = document.getElementById('chDisp');
+  document.getElementById('chNum').textContent = String(idx + 1).padStart(2, '0');
+  d.classList.add('show');
+  clearTimeout(chTimer);
+  chTimer = setTimeout(function() { d.classList.remove('show'); }, 3000);
+}
 
-  function play(i) {
-    if (list.length === 0) return;
-    idx = ((i % list.length) + list.length) % list.length;
-    var v = list[idx];
-    var screen = document.getElementById('screen');
+function loadVideo(i) {
+  if (list.length === 0 || !playerReady) return;
+  idx = ((i % list.length) + list.length) % list.length;
+  var v = list[idx];
+  doFlash();
+  player.loadVideoById({ videoId: v.id });
+  document.getElementById('npTitle').textContent = v.t;
+  showCh();
+}
 
-    doFlash();
+function nextCh() { loadVideo(idx + 1); }
+function prevCh() { loadVideo(idx - 1); }
 
-    var old = screen.querySelector('iframe');
-    if (old) old.remove();
-
-    var iframe = document.createElement('iframe');
-    // mute=1 allows autoplay on mobile; user can unmute via YouTube controls
-    var src = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1&mute=' + (isMobile && !userTapped ? '1' : '0') + '&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3';
-    iframe.setAttribute('src', src);
-    iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('playsinline', '');
-    screen.appendChild(iframe);
-
-    document.getElementById('npTitle').textContent = v.t;
-    showCh();
-
-    // Hide tap hint after first play
-    var hint = document.getElementById('tapHint');
-    if (hint) hint.style.display = 'none';
-  }
-
-  function next() { play(idx + 1); }
-  function prev() { play(idx - 1); }
-
-  function togShuf() {
-    shuf = !shuf;
-    document.getElementById('bShuf').classList.toggle('on', shuf);
-    buildList();
-    idx = 0;
-    play(0);
-  }
-
-  function setCat(c) {
-    cat = c;
-    document.getElementById('bMusic').classList.toggle('on', c === 'music');
-    document.getElementById('bLive').classList.toggle('on', c === 'live');
-    document.getElementById('bAll').classList.toggle('on', c === 'all');
-    buildList();
-    idx = 0;
-    play(0);
-  }
-
-  // Wire up all buttons
-  document.getElementById('bPrev').addEventListener('click', function(e) { e.preventDefault(); prev(); });
-  document.getElementById('bNext').addEventListener('click', function(e) { e.preventDefault(); next(); });
-  document.getElementById('bShuf').addEventListener('click', function(e) { e.preventDefault(); togShuf(); });
-  document.getElementById('bMusic').addEventListener('click', function(e) { e.preventDefault(); setCat('music'); });
-  document.getElementById('bLive').addEventListener('click', function(e) { e.preventDefault(); setCat('live'); });
-  document.getElementById('bAll').addEventListener('click', function(e) { e.preventDefault(); setCat('all'); });
-  document.getElementById('knobL').addEventListener('click', function(e) { e.preventDefault(); prev(); });
-  document.getElementById('knobR').addEventListener('click', function(e) { e.preventDefault(); next(); });
-
-  // Mobile: tap screen to start (and unmute)
-  document.getElementById('screen').addEventListener('click', function() {
-    if (!userTapped) {
-      userTapped = true;
-      play(idx); // replay current with sound
-    }
-  });
-
-  // Keyboard
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowRight' || e.key === 'n') next();
-    if (e.key === 'ArrowLeft' || e.key === 'p') prev();
-    if (e.key === 's') togShuf();
-  });
-
-  // Touch events for buttons (mobile responsiveness)
-  var allBtns = document.querySelectorAll('.btn');
-  for (var i = 0; i < allBtns.length; i++) {
-    allBtns[i].addEventListener('touchend', function(e) {
-      e.preventDefault();
-      this.click();
-    });
-  }
-
-  // Start
+function togShuf() {
+  shuf = !shuf;
+  document.getElementById('bShuf').classList.toggle('on', shuf);
   buildList();
-  setTimeout(function() { play(0); }, 600);
+  idx = 0;
+  loadVideo(0);
+}
 
-})();
+function setCat(c) {
+  cat = c;
+  document.getElementById('bMusic').classList.toggle('on', c === 'music');
+  document.getElementById('bLive').classList.toggle('on', c === 'live');
+  document.getElementById('bAll').classList.toggle('on', c === 'all');
+  buildList();
+  idx = 0;
+  loadVideo(0);
+}
+
+// Called by YouTube API when ready
+function onYouTubeIframeAPIReady() {
+  buildList();
+  var firstVid = list[0];
+
+  player = new YT.Player('ytplayer', {
+    videoId: firstVid.id,
+    playerVars: {
+      autoplay: 0,
+      mute: 1,
+      playsinline: 1,
+      controls: 1,
+      rel: 0,
+      modestbranding: 1,
+      iv_load_policy: 3
+    },
+    events: {
+      onReady: function(event) {
+        playerReady = true;
+        document.getElementById('npTitle').textContent = firstVid.t;
+        showCh();
+
+        // Try muted autoplay (works on desktop + some mobile)
+        event.target.mute();
+        event.target.playVideo();
+
+        // Check if autoplay worked after 1.5s
+        setTimeout(function() {
+          var state = player.getPlayerState();
+          // YT.PlayerState.PLAYING = 1
+          if (state === 1) {
+            // Autoplay worked! Hide the play overlay
+            document.getElementById('playOverlay').classList.add('hidden');
+            started = true;
+          }
+          // Otherwise the play overlay stays visible
+        }, 1500);
+      },
+      onStateChange: function(event) {
+        // When a video ends, auto-advance to next
+        if (event.data === 0) { // YT.PlayerState.ENDED
+          nextCh();
+        }
+        // If playing, hide overlay
+        if (event.data === 1) {
+          document.getElementById('playOverlay').classList.add('hidden');
+          started = true;
+        }
+      }
+    }
+  });
+}
+
+// Play overlay tap — guaranteed to work on iOS because it's a user gesture
+document.getElementById('playOverlay').addEventListener('click', function() {
+  if (playerReady) {
+    player.unMute();
+    player.playVideo();
+    this.classList.add('hidden');
+    started = true;
+  }
+});
+
+// Wire up buttons
+document.getElementById('bPrev').addEventListener('click', function() { prevCh(); });
+document.getElementById('bNext').addEventListener('click', function() { nextCh(); });
+document.getElementById('bShuf').addEventListener('click', function() { togShuf(); });
+document.getElementById('bMusic').addEventListener('click', function() { setCat('music'); });
+document.getElementById('bLive').addEventListener('click', function() { setCat('live'); });
+document.getElementById('bAll').addEventListener('click', function() { setCat('all'); });
+document.getElementById('knobL').addEventListener('click', function() { prevCh(); });
+document.getElementById('knobR').addEventListener('click', function() { nextCh(); });
+
+// Keyboard
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'n') nextCh();
+  if (e.key === 'ArrowLeft' || e.key === 'p') prevCh();
+  if (e.key === 's') togShuf();
+});
 </script>
 
 </body>
