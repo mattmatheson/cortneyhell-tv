@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORTNEYHELL.TV</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap');
+
+  :root {
+    --static-opacity: 0.04;
+    --glow-color: rgba(200, 255, 200, 0.08);
+    --crt-curve: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #ccc;
+    font-family: 'VT323', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='3' fill='%23fff' opacity='0.5'/%3E%3C/svg%3E") 12 12, auto;
+  }
+
+  /* ===== CARPET / WALLPAPER BACKGROUND ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(40, 20, 60, 0.5) 0%, transparent 70%),
+      repeating-conic-gradient(rgba(20, 15, 25, 0.3) 0% 25%, transparent 0% 50%) 0 0 / 40px 40px;
+    z-index: 0;
+  }
+
+  /* ===== TV UNIT ===== */
+  .tv-room {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .tv-cabinet {
+    position: relative;
+    background: linear-gradient(180deg, #5c3d2e 0%, #4a3122 40%, #3d2819 100%);
+    border-radius: 18px 18px 8px 8px;
+    padding: 28px 28px 20px;
+    box-shadow:
+      0 8px 40px rgba(0,0,0,0.7),
+      inset 0 2px 0 rgba(255,255,255,0.05),
+      inset 0 -2px 4px rgba(0,0,0,0.3);
+  }
+
+  /* Wood grain texture */
+  .tv-cabinet::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border-radius: 18px 18px 8px 8px;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.03) 3px,
+      rgba(0,0,0,0.03) 6px
+    );
+    pointer-events: none;
+  }
+
+  .tv-bezel {
+    background: #1a1a1a;
+    border-radius: var(--crt-curve);
+    padding: 16px;
+    position: relative;
+    box-shadow:
+      inset 0 0 30px rgba(0,0,0,0.8),
+      0 0 0 2px #111,
+      0 0 0 4px #2a2a2a;
+  }
+
+  .screen-container {
+    position: relative;
+    width: min(70vw, 640px);
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  /* CRT curvature effect */
+  .screen-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 60%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+    z-index: 2;
+    pointer-events: none;
+    border-radius: 8px;
+  }
+
+  /* Scanlines */
+  .screen-container::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.15) 2px,
+      rgba(0, 0, 0, 0.15) 4px
+    );
+    z-index: 2;
+    pointer-events: none;
+    border-radius: 8px;
+  }
+
+  /* Screen glare */
+  .screen-glare {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 40%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    z-index: 3;
+    pointer-events: none;
+    border-radius: 8px;
+  }
+
+  /* Static noise overlay */
+  .static-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    opacity: var(--static-opacity);
+    border-radius: 8px;
+    mix-blend-mode: overlay;
+  }
+
+  /* YouTube embed */
+  .screen-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Power off / static state */
+  .screen-static {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 5;
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+    border-radius: 8px;
+  }
+
+  .screen-static.off {
+    opacity: 1;
+  }
+
+  .screen-static.on {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Channel info overlay */
+  .channel-info {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    z-index: 4;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.8), 0 0 10px rgba(255,255,255,0.2);
+    text-align: right;
+    pointer-events: none;
+    transition: opacity 0.5s;
+  }
+
+  .channel-info .ch-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    display: block;
+  }
+
+  .channel-info .ch-label {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  /* Now playing bar */
+  .now-playing {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    z-index: 4;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    padding: 30px 16px 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .screen-container:hover .now-playing {
+    opacity: 1;
+  }
+
+  .now-playing .title {
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+  }
+
+  .now-playing .subtitle {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+  }
+
+  /* ===== TV CONTROLS ===== */
+  .tv-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    padding: 0 8px;
+  }
+
+  .tv-brand {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: rgba(255, 255, 255, 0.15);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .tv-knobs {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .knob {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #555, #222);
+    border: 2px solid #333;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .knob::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 6px;
+    background: #888;
+    border-radius: 1px;
+  }
+
+  .knob:hover {
+    transform: rotate(30deg);
+  }
+
+  .knob:active {
+    transform: rotate(60deg) scale(0.95);
+  }
+
+  .power-light {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff1a1a;
+    box-shadow: 0 0 6px rgba(255, 26, 26, 0.6);
+    transition: all 0.3s;
+  }
+
+  .power-light.on {
+    background: #00ff44;
+    box-shadow: 0 0 8px rgba(0, 255, 68, 0.6);
+  }
+
+  /* ===== BOTTOM CONTROLS ===== */
+  .remote-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 640px;
+  }
+
+  .remote-btn {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    padding: 8px 16px;
+    background: #1a1a1a;
+    color: #888;
+    border: 1px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .remote-btn:hover {
+    background: #252525;
+    color: #fff;
+    border-color: #555;
+  }
+
+  .remote-btn:active {
+    transform: scale(0.96);
+    background: #333;
+  }
+
+  .remote-btn.active {
+    color: #ff1a1a;
+    border-color: #ff1a1a;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+    color: rgba(255,255,255,0.12);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+  }
+
+  .site-header span {
+    color: rgba(255, 50, 50, 0.35);
+  }
+
+  /* ===== FOOTER ===== */
+  .site-footer {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.15);
+    text-align: center;
+    z-index: 1;
+    position: relative;
+    letter-spacing: 0.1em;
+  }
+
+  .site-footer a {
+    color: rgba(255, 50, 50, 0.4);
+    text-decoration: none;
+  }
+
+  /* ===== TURN ON ANIMATION ===== */
+  @keyframes turn-on {
+    0% {
+      transform: scaleY(0.005) scaleX(0.3);
+      filter: brightness(30);
+    }
+    10% {
+      transform: scaleY(0.005) scaleX(1);
+      filter: brightness(10);
+    }
+    30% {
+      transform: scaleY(1) scaleX(1);
+      filter: brightness(3);
+    }
+    100% {
+      transform: scaleY(1) scaleX(1);
+      filter: brightness(1);
+    }
+  }
+
+  .screen-container.turning-on iframe {
+    animation: turn-on 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+  }
+
+  /* ===== CHANNEL SWITCH FLASH ===== */
+  @keyframes channel-switch {
+    0% { opacity: 1; background: #fff; }
+    15% { opacity: 0.8; background: #111; }
+    30% { opacity: 1; background: #888; }
+    50% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  .switch-flash {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    border-radius: 8px;
+  }
+
+  .switch-flash.active {
+    animation: channel-switch 0.4s ease-out forwards;
+  }
+
+  /* ===== VHS TRACKING ===== */
+  @keyframes vhs-track {
+    0% { transform: translateX(0); }
+    10% { transform: translateX(-2px); }
+    20% { transform: translateX(1px); }
+    30% { transform: translateX(-1px); }
+    40% { transform: translateX(3px); }
+    50% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 700px) {
+    .tv-cabinet {
+      padding: 16px 16px 14px;
+      border-radius: 12px 12px 6px 6px;
+    }
+    .tv-bezel { padding: 10px; }
+    .screen-container { width: 85vw; }
+    .remote-controls { gap: 5px; }
+    .remote-btn { font-size: 0.85rem; padding: 6px 10px; }
+  }
+
+  @media (max-width: 400px) {
+    .screen-container { width: 92vw; }
+    .tv-cabinet { padding: 10px 10px 10px; }
+    .tv-bezel { padding: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="site-header">cortney<span>hell</span>.tv</div>
+
+<div class="tv-room">
+  <div class="tv-cabinet">
+    <div class="tv-bezel">
+      <div class="screen-container" id="screen">
+        <div class="screen-static off" id="staticScreen">
+          <svg width="80" height="30" viewBox="0 0 80 30">
+            <text x="0" y="22" fill="rgba(255,255,255,0.1)" font-family="'VT323', monospace" font-size="18">NO SIGNAL</text>
+          </svg>
+        </div>
+        <div class="switch-flash" id="switchFlash"></div>
+        <div class="static-overlay" id="staticOverlay"></div>
+        <div class="screen-glare"></div>
+        <div class="channel-info" id="channelInfo">
+          <span class="ch-label">CH</span>
+          <span class="ch-number" id="chNumber">01</span>
+        </div>
+        <div class="now-playing" id="nowPlaying">
+          <div class="title" id="npTitle">—</div>
+          <div class="subtitle">CORTNEYHELL.TV</div>
+        </div>
+        <!-- iframe injected by JS -->
+      </div>
+    </div>
+    <div class="tv-controls">
+      <div class="tv-brand">cortneyhell.tv</div>
+      <div class="tv-knobs">
+        <div class="power-light on" id="powerLight"></div>
+        <div class="knob" id="knobLeft" title="Previous channel"></div>
+        <div class="knob" id="knobRight" title="Next channel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="remote-controls">
+  <button class="remote-btn" onclick="prevChannel()">&#9664; PREV</button>
+  <button class="remote-btn" onclick="toggleShuffle()" id="shuffleBtn">SHUFFLE</button>
+  <button class="remote-btn" onclick="nextChannel()">NEXT &#9654;</button>
+  <button class="remote-btn" onclick="toggleCategory('music')" id="catMusic">MUSIC VIDEOS</button>
+  <button class="remote-btn" onclick="toggleCategory('live')" id="catLive">LIVE SETS</button>
+  <button class="remote-btn" onclick="toggleCategory('all')" id="catAll" class="active">ALL</button>
+</div>
+
+<div class="site-footer">
+  <a href="https://youtube.com/@cortneyhell" target="_blank">youtube.com/@cortneyhell</a> &mdash;
+  <a href="https://instagram.com/cortneyhell" target="_blank">@cortneyhell</a>
+</div>
+
+<script>
+const VIDEOS = {
+  music: [
+    { id: '3QLqlImJutc', title: 'idioteque' },
+    { id: '6tWwB4nBRbE', title: 'i just need enough' },
+    { id: 'TDdOjHu6UNs', title: 'ice cold' },
+    { id: '9MwEilCe6-k', title: 'make it forever' },
+    { id: 'Ev76E9wqSUo', title: 'hanging like a pendant' },
+    { id: 'izh4gmi9oko', title: 'weekend fever' },
+    { id: 'My2f81pM3ok', title: 'sweep away my shadow' },
+    { id: 'Log8nwiSspk', title: 'strange' },
+    { id: 'VAli6pkEuiE', title: 'this bliss' },
+    { id: '7UQaotJHFr4', title: 'plowed' },
+    { id: 'K3y_6_r5Bgs', title: 'what you got' },
+    { id: '8FhqWcP0hgo', title: 'low' },
+    { id: 'LpHQeUjEhvw', title: 'Tombstone - Charlatan' },
+    { id: 'fNSMhsoo6S4', title: 'Twin Stacks - The Hurt' },
+    { id: 'vy_Ubw8kn3Y', title: 'Hushhh - In My Head' },
+    { id: 'tf6-_u_kVhI', title: 'LETHAL METHOD - C.L.Y.D.' },
+    { id: 'QogDZdzpfP0', title: 'Gorge - Soul Servant' },
+    { id: 'AmGthVkxlhc', title: 'FRENZY - STRENGTH TO SURVIVE' },
+    { id: 's5gIP14yGCc', title: 'LETHAL METHOD - Found Sounds Sessions' },
+    { id: '8vK0PXALZhI', title: 'Dallas Murrae - I Don\'t Smoke' },
+  ],
+  live: [
+    { id: '4iWGxePe2NA', title: 'Keep the Piece @ Arcane Workshop 3.7.26' },
+    { id: 'erUODxg8MMA', title: 'Twin Stacks @ The End 3.1.26' },
+    { id: 'qUOs3Z9fs-s', title: 'Gorge @ Arcane Workshop 2.25.26' },
+    { id: 'Bu5j1aQ4Ef0', title: 'Joint Funeral @ Inglewood Lounge 2.16.26' },
+    { id: 'vPRae0PQXYU', title: 'Aim Down Sight @ Tempo 2.12.26' },
+    { id: 'LoTFRJT5K28', title: 'On The Brink @ Tempo 2.12.26' },
+    { id: 'JkeNIDGbY-E', title: 'Dogpile @ Tempo 2.12.26' },
+    { id: 'DoOQXBTMJJo', title: 'Lethal Method @ drkmttr 2.11.26' },
+    { id: 'CuYYoeYlTkk', title: 'Gorge @ Vinyl Lounge 2.7.26' },
+    { id: 'XlDJ7waGSz8', title: 'Die Trying @ drkmttr 2.6.26' },
+    { id: 'c7554e-6Mb8', title: 'Finda Brita @ Mean Mel\'s, Cookeville 1.30.26' },
+    { id: 'sb7rnjRN11o', title: 'Gorge @ Tempo 2.1.26' },
+    { id: 'ui8kzz2tsfc', title: 'Grow Blind @ Fuchsia Fest 2024' },
+    { id: 'vF5BGMDSIVo', title: 'Fuchsia Fest 2024' },
+    { id: 'Wc8bc2zCr3s', title: 'Gorge @ Eastside Bowl 12.13.25' },
+    { id: 'Nvyj1OPNoe4', title: 'Better Off @ The End 12.2.23' },
+    { id: 'YI8X5uC8ahs', title: 'Lethal Method @ Vinyl Lounge 10.25.25' },
+    { id: 'Q-ufICWUZv0', title: 'Twin Stacks @ Arcane Workshop 9.15.24' },
+    { id: 'ikxVoh8i8Ko', title: 'Orthodox @ The Basement 6.20.25' },
+    { id: 'gWmQ9sLVOao', title: 'Idiot @ Arcane Workshop 4.11.24' },
+    { id: 'XKl-r_H8ePk', title: 'Blemish @ Arcane Workshop 11.30.25' },
+    { id: 'aZYJ_qXDs78', title: 'Hushhh @ The Cowan 1.11.24' },
+    { id: '-b6Ju8Z2wr8', title: 'Better Off @ The End 6.22.24' },
+    { id: 'CxaCNZtBsZw', title: 'On The Brink @ Arcane Workshop 7.12.25' },
+    { id: 'UjnUp4obxXE', title: 'Lethal Method @ The End 12.17.23' },
+    { id: 'hwX-5XjiPLA', title: 'Thirty Nights @ drkmttr 3.31.24' },
+  ]
+};
+
+let currentCategory = 'all';
+let playlist = [];
+let currentIndex = 0;
+let shuffleMode = true;
+let player = null;
+
+function getAllVideos() {
+  return [...VIDEOS.music, ...VIDEOS.live];
+}
+
+function getPlaylist() {
+  let vids;
+  if (currentCategory === 'music') vids = [...VIDEOS.music];
+  else if (currentCategory === 'live') vids = [...VIDEOS.live];
+  else vids = getAllVideos();
+
+  if (shuffleMode) {
+    for (let i = vids.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [vids[i], vids[j]] = [vids[j], vids[i]];
+    }
+  }
+  return vids;
+}
+
+function channelSwitch() {
+  const flash = document.getElementById('switchFlash');
+  flash.classList.remove('active');
+  void flash.offsetWidth;
+  flash.classList.add('active');
+}
+
+function showChannelInfo() {
+  const info = document.getElementById('channelInfo');
+  const num = document.getElementById('chNumber');
+  num.textContent = String(currentIndex + 1).padStart(2, '0');
+  info.style.opacity = '1';
+  clearTimeout(window._chTimeout);
+  window._chTimeout = setTimeout(() => {
+    info.style.opacity = '0';
+  }, 3000);
+}
+
+function loadVideo(index) {
+  if (playlist.length === 0) return;
+  currentIndex = ((index % playlist.length) + playlist.length) % playlist.length;
+  const video = playlist[currentIndex];
+  const screen = document.getElementById('screen');
+  const staticScreen = document.getElementById('staticScreen');
+
+  channelSwitch();
+
+  // Remove old iframe
+  const oldIframe = screen.querySelector('iframe');
+  if (oldIframe) oldIframe.remove();
+
+  // Create new iframe
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&enablejsapi=1`;
+  iframe.allow = 'autoplay; encrypted-media';
+  iframe.allowFullscreen = true;
+  screen.appendChild(iframe);
+
+  // Update UI
+  staticScreen.classList.remove('off');
+  staticScreen.classList.add('on');
+  document.getElementById('npTitle').textContent = video.title;
+  showChannelInfo();
+  screen.classList.add('turning-on');
+  setTimeout(() => screen.classList.remove('turning-on'), 600);
+}
+
+function nextChannel() {
+  loadVideo(currentIndex + 1);
+}
+
+function prevChannel() {
+  loadVideo(currentIndex - 1);
+}
+
+function toggleShuffle() {
+  shuffleMode = !shuffleMode;
+  document.getElementById('shuffleBtn').classList.toggle('active', shuffleMode);
+  playlist = getPlaylist();
+  currentIndex = 0;
+  loadVideo(0);
+}
+
+function toggleCategory(cat) {
+  currentCategory = cat;
+  document.getElementById('catMusic').classList.toggle('active', cat === 'music');
+  document.getElementById('catLive').classList.toggle('active', cat === 'live');
+  document.getElementById('catAll').classList.toggle('active', cat === 'all');
+  playlist = getPlaylist();
+  currentIndex = 0;
+  loadVideo(0);
+}
+
+// Keyboard controls
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'n') nextChannel();
+  if (e.key === 'ArrowLeft' || e.key === 'p') prevChannel();
+  if (e.key === 's') toggleShuffle();
+});
+
+// Knob controls
+document.getElementById('knobLeft').addEventListener('click', prevChannel);
+document.getElementById('knobRight').addEventListener('click', nextChannel);
+
+// Static noise canvas
+function initStatic() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 320;
+  canvas.height = 240;
+  const ctx = canvas.getContext('2d');
+  const overlay = document.getElementById('staticOverlay');
+
+  function drawStatic() {
+    const imageData = ctx.createImageData(320, 240);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const v = Math.random() * 255;
+      data[i] = v;
+      data[i + 1] = v;
+      data[i + 2] = v;
+      data[i + 3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    overlay.style.backgroundImage = `url(${canvas.toDataURL()})`;
+    overlay.style.backgroundSize = 'cover';
+    requestAnimationFrame(drawStatic);
+  }
+  drawStatic();
+}
+
+// Init
+function init() {
+  initStatic();
+  document.getElementById('shuffleBtn').classList.add('active');
+  playlist = getPlaylist();
+  // Small delay for dramatic TV turn-on
+  setTimeout(() => {
+    loadVideo(0);
+    document.getElementById('powerLight').classList.add('on');
+  }, 800);
+}
+
+init();
+</script>
+
+</body>
+</html>
