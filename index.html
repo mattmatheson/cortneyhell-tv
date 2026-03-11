@@ -148,16 +148,17 @@
     border-radius: 8px;
   }
 
-  /* Static noise overlay */
+  /* Static noise overlay — CSS only, no canvas needed */
   .static-overlay {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
     z-index: 3;
     pointer-events: none;
-    opacity: var(--static-opacity);
+    opacity: 0.03;
     border-radius: 8px;
-    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: cover;
   }
 
   /* YouTube embed */
@@ -506,12 +507,12 @@
 </div>
 
 <div class="remote-controls">
-  <button class="remote-btn" onclick="prevChannel()">&#9664; PREV</button>
-  <button class="remote-btn" onclick="toggleShuffle()" id="shuffleBtn">SHUFFLE</button>
-  <button class="remote-btn" onclick="nextChannel()">NEXT &#9654;</button>
-  <button class="remote-btn" onclick="toggleCategory('music')" id="catMusic">MUSIC VIDEOS</button>
-  <button class="remote-btn" onclick="toggleCategory('live')" id="catLive">LIVE SETS</button>
-  <button class="remote-btn" onclick="toggleCategory('all')" id="catAll" class="active">ALL</button>
+  <button class="remote-btn" id="prevBtn">&#9664; PREV</button>
+  <button class="remote-btn" id="shuffleBtn">SHUFFLE</button>
+  <button class="remote-btn" id="nextBtn">NEXT &#9654;</button>
+  <button class="remote-btn" id="catMusic">MUSIC VIDEOS</button>
+  <button class="remote-btn" id="catLive">LIVE SETS</button>
+  <button class="remote-btn active" id="catAll">ALL</button>
 </div>
 
 <div class="site-footer">
@@ -682,39 +683,20 @@ document.addEventListener('keydown', (e) => {
 document.getElementById('knobLeft').addEventListener('click', prevChannel);
 document.getElementById('knobRight').addEventListener('click', nextChannel);
 
-// Static noise canvas
-function initStatic() {
-  const canvas = document.createElement('canvas');
-  canvas.width = 320;
-  canvas.height = 240;
-  const ctx = canvas.getContext('2d');
-  const overlay = document.getElementById('staticOverlay');
-
-  function drawStatic() {
-    const imageData = ctx.createImageData(320, 240);
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      const v = Math.random() * 255;
-      data[i] = v;
-      data[i + 1] = v;
-      data[i + 2] = v;
-      data[i + 3] = 255;
-    }
-    ctx.putImageData(imageData, 0, 0);
-    overlay.style.backgroundImage = `url(${canvas.toDataURL()})`;
-    overlay.style.backgroundSize = 'cover';
-    requestAnimationFrame(drawStatic);
-  }
-  drawStatic();
-}
-
 // Init
 function init() {
-  initStatic();
+  // Button event listeners
+  document.getElementById('prevBtn').addEventListener('click', function() { prevChannel(); });
+  document.getElementById('nextBtn').addEventListener('click', function() { nextChannel(); });
+  document.getElementById('shuffleBtn').addEventListener('click', function() { toggleShuffle(); });
+  document.getElementById('catMusic').addEventListener('click', function() { toggleCategory('music'); });
+  document.getElementById('catLive').addEventListener('click', function() { toggleCategory('live'); });
+  document.getElementById('catAll').addEventListener('click', function() { toggleCategory('all'); });
+
   document.getElementById('shuffleBtn').classList.add('active');
   playlist = getPlaylist();
   // Small delay for dramatic TV turn-on
-  setTimeout(() => {
+  setTimeout(function() {
     loadVideo(0);
     document.getElementById('powerLight').classList.add('on');
   }, 800);
