@@ -74,35 +74,7 @@
     background: #000;
   }
 
-  /* CRT vignette */
-  .crt-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%);
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 8px;
-  }
-
-  /* Scanlines */
-  .scanlines {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: repeating-linear-gradient(transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 8px;
-  }
-
-  /* Glare */
-  .screen-glare {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.02) 100%);
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 8px;
-  }
+  /* CRT effects removed for clean video view */
 
   .screen-container iframe {
     width: 100%;
@@ -372,9 +344,6 @@
       <div class="screen-container" id="screen">
         <div id="ytplayer"></div>
         <div class="flash" id="flash"></div>
-        <div class="crt-overlay"></div>
-        <div class="scanlines"></div>
-        <div class="screen-glare"></div>
         <div class="channel-display" id="chDisp">
           <span class="ch-label">CH</span>
           <span class="ch-num" id="chNum">01</span>
