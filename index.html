@@ -87,7 +87,7 @@
   }
 
   .tv-image {
-    width: min(70vw, 580px);
+    width: min(77vw, 640px);
     height: auto;
     display: block;
     position: relative;
@@ -177,10 +177,10 @@
     padding: 30px 16px 12px;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.4s;
+    transition: opacity 0.5s;
   }
 
-  .screen-area:hover .now-playing { opacity: 1; }
+  .now-playing.show { opacity: 1; }
 
   .now-playing .np-title {
     font-family: 'VT323', monospace;
@@ -204,23 +204,43 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 5;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(190,188,182,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(210,208,200,0.6);
     border-radius: 50%;
     cursor: pointer;
-    color: rgba(255,255,255,0.5);
-    transition: all 0.15s;
+    color: rgba(90,88,80,0.7);
+    transition: all 0.2s;
     -webkit-tap-highlight-color: transparent;
     padding: 8px;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+    overflow: hidden;
   }
 
-  .tv-nav:hover { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
-  .tv-nav:active { transform: translateY(-50%) scale(0.9); }
+  .tv-nav::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .tv-nav:hover {
+    color: rgba(80,78,72,0.9);
+    background: rgba(200,198,190,0.9);
+    border-color: rgba(220,218,210,0.7);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .tv-nav:active { transform: translateY(-50%) scale(0.92); }
 
   .tv-nav svg {
     width: 28px;
@@ -239,7 +259,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 2px;
   }
 
   .ctrl-btn {
@@ -270,11 +290,36 @@
     color: rgba(255,255,255,0.8);
   }
 
+  .ctrl-circle {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ctrl-circle:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+  }
+
   .ctrl-div {
     width: 1px;
     height: 12px;
     background: rgba(255,255,255,0.2);
   }
+
+  .ctrl-unmute, .ctrl-unmute-div { display: none; }
+
+  @media (max-width: 700px) {
+    .ctrl-unmute, .ctrl-unmute-div { display: flex; }
+  }
+
+  .ctrl-unmute.hidden, .ctrl-unmute.hidden + .ctrl-unmute-div { display: none !important; }
 
   /* Content container — left-aligned block */
   .content-block {
@@ -287,14 +332,13 @@
   /* Header */
   .hdr {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-size: 2rem;
     font-weight: 400;
     color: rgba(255,255,255,0.7);
     letter-spacing: 0.12em;
     text-transform: lowercase;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.3);
     margin-top: 40px;
-    margin-bottom: -54px;
+    margin-bottom: 4px;
     text-align: left;
     z-index: 1;
     position: relative;
@@ -326,7 +370,7 @@
     gap: 24px;
     margin-top: 60px;
     padding: 20px 0;
-    border-top: 1px solid rgba(0,0,0,0.06);
+    border-top: none;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.65rem;
     font-weight: 700;
@@ -354,31 +398,26 @@
   /* Social handles */
   .hdr-socials {
     display: flex;
-    gap: 16px;
-    justify-content: flex-start;
-    margin-bottom: 8px;
+    gap: 20px;
+    justify-content: center;
     z-index: 1;
     position: relative;
   }
 
   .hdr-socials a {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.5rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    color: rgba(0,0,0,0.18);
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.5);
     text-decoration: none;
-    letter-spacing: 0.25em;
-    text-transform: lowercase;
     display: flex;
     align-items: center;
     gap: 5px;
     transition: color 0.2s;
   }
 
-  .hdr-socials a:hover { color: rgba(0,0,0,0.35); }
-
-  .hdr-socials svg { opacity: 0.3; }
-  .hdr-socials a:hover svg { opacity: 0.5; }
+  .hdr-socials a:hover { color: rgba(255,255,255,0.8); }
 
   /* About */
   .about-section {
@@ -579,10 +618,6 @@
     .book-row-inline { flex-direction: column; }
   }
 
-  @media (max-width: 400px) {
-    .book-section { width: 96vw; }
-    .about-section { width: 96vw; }
-  }
 
   /* Channel switch flash */
   @keyframes flash {
@@ -653,9 +688,10 @@
   }
 
   @media (max-width: 700px) {
-    .tv-image { width: 90vw; }
-    .controls { width: 90vw; margin-top: -30px; }
-    .hdr { margin-bottom: -20px; }
+    .tv-image { width: 120vw; }
+    .controls { width: 90vw; margin-top: -60px; }
+    .hdr { margin-bottom: 2px; font-size: 1.8rem; }
+    .hdr-socials { margin-top: 0; margin-bottom: 6px; }
     .ftr-right { display: none; }
     .tv-nav-prev { left: -10px; }
     .tv-nav-next { right: -10px; }
@@ -663,10 +699,6 @@
     body { padding: 24px 12px; }
   }
 
-  @media (max-width: 400px) {
-    .tv-image { width: 96vw; }
-    .controls { width: 96vw; }
-  }
 </style>
 </head>
 <body>
@@ -676,6 +708,10 @@
 <div class="vignette"></div>
 
 <div class="hdr">cortney<span>hell</span>.tv</div>
+<div class="hdr-socials" style="margin-bottom:12px;">
+  <a href="https://youtube.com/@cortneyhell" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg> @cortneyhell</a>
+  <a href="https://instagram.com/cortneyhell" target="_blank"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg> @cortneyhell</a>
+</div>
 
 <div class="tv-room">
   <div class="tv-wrapper">
@@ -701,16 +737,20 @@
     <!-- Hidden clickable buttons on the TV itself -->
     <button class="tv-btn tv-btn-chdn" id="tvChDn" title="CH-"></button>
     <button class="tv-btn tv-btn-chup" id="tvChUp" title="CH+"></button>
-    <button class="tv-nav tv-nav-prev" id="bPrev" title="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
-    <button class="tv-nav tv-nav-next" id="bNext" title="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
   </div>
 
   <div class="controls">
+    <button class="ctrl-btn ctrl-circle" id="bPrev"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+    <button class="ctrl-btn ctrl-unmute" id="bUnmute"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg></button>
+    <span class="ctrl-div ctrl-unmute-div"></span>
     <button class="ctrl-btn" id="bMusic">music</button>
     <span class="ctrl-div"></span>
     <button class="ctrl-btn" id="bLive">live</button>
     <span class="ctrl-div"></span>
     <button class="ctrl-btn on" id="bAll">all</button>
+    <span class="ctrl-div"></span>
+    <button class="ctrl-btn on" id="bShuf">shuffle</button>
+    <button class="ctrl-btn ctrl-circle" id="bNext"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
   </div>
 </div>
 
@@ -743,65 +783,59 @@
   </form>
 </div>
 
-<div class="ftr">
-  <div class="ftr-left">
-    <a href="https://youtube.com/@cortneyhell" target="_blank" title="YouTube"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
-    <a href="https://instagram.com/cortneyhell" target="_blank" title="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
-  </div>
-</div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 var musicVids = [
-  { id: '3QLqlImJutc', t: 'idioteque' },
-  { id: '6tWwB4nBRbE', t: 'i just need enough' },
-  { id: 'TDdOjHu6UNs', t: 'ice cold' },
-  { id: '9MwEilCe6-k', t: 'make it forever' },
-  { id: 'Ev76E9wqSUo', t: 'hanging like a pendant' },
-  { id: 'izh4gmi9oko', t: 'weekend fever' },
-  { id: 'My2f81pM3ok', t: 'sweep away my shadow' },
-  { id: 'Log8nwiSspk', t: 'strange' },
-  { id: 'VAli6pkEuiE', t: 'this bliss' },
-  { id: '7UQaotJHFr4', t: 'plowed' },
-  { id: 'K3y_6_r5Bgs', t: 'what you got' },
-  { id: '8FhqWcP0hgo', t: 'low' },
-  { id: 'LpHQeUjEhvw', t: 'Tombstone - Charlatan' },
-  { id: 'fNSMhsoo6S4', t: 'Twin Stacks - The Hurt' },
-  { id: 'vy_Ubw8kn3Y', t: 'Hushhh - In My Head' },
-  { id: 'tf6-_u_kVhI', t: 'LETHAL METHOD - C.L.Y.D.' },
-  { id: 'QogDZdzpfP0', t: 'Gorge - Soul Servant' },
-  { id: 'AmGthVkxlhc', t: 'FRENZY - STRENGTH TO SURVIVE' },
-  { id: 's5gIP14yGCc', t: 'LETHAL METHOD - Found Sounds Sessions' },
-  { id: '8vK0PXALZhI', t: "Dallas Murrae - I Don't Smoke" }
+  { id: '3QLqlImJutc', t: 'idioteque', ch: 3 },
+  { id: '6tWwB4nBRbE', t: 'i just need enough', ch: 7 },
+  { id: 'TDdOjHu6UNs', t: 'ice cold', ch: 12 },
+  { id: '9MwEilCe6-k', t: 'make it forever', ch: 15 },
+  { id: 'Ev76E9wqSUo', t: 'hanging like a pendant', ch: 18 },
+  { id: 'izh4gmi9oko', t: 'weekend fever', ch: 22 },
+  { id: 'My2f81pM3ok', t: 'sweep away my shadow', ch: 25 },
+  { id: 'Log8nwiSspk', t: 'strange', ch: 28 },
+  { id: 'VAli6pkEuiE', t: 'this bliss', ch: 31 },
+  { id: '7UQaotJHFr4', t: 'plowed', ch: 34 },
+  { id: 'K3y_6_r5Bgs', t: 'what you got', ch: 37 },
+  { id: '8FhqWcP0hgo', t: 'low', ch: 40 },
+  { id: 'LpHQeUjEhvw', t: 'Tombstone - Charlatan', ch: 43 },
+  { id: 'fNSMhsoo6S4', t: 'Twin Stacks - The Hurt', ch: 46 },
+  { id: 'vy_Ubw8kn3Y', t: 'Hushhh - In My Head', ch: 49 },
+  { id: 'tf6-_u_kVhI', t: 'LETHAL METHOD - C.L.Y.D.', ch: 52 },
+  { id: 'QogDZdzpfP0', t: 'Gorge - Soul Servant', ch: 55 },
+  { id: 'AmGthVkxlhc', t: 'FRENZY - STRENGTH TO SURVIVE', ch: 58 },
+  { id: 's5gIP14yGCc', t: 'LETHAL METHOD - Found Sounds Sessions', ch: 61 },
+  { id: '8vK0PXALZhI', t: "Dallas Murrae - I Don't Smoke", ch: 64 }
 ];
 
 var liveVids = [
-  { id: '4iWGxePe2NA', t: 'Keep the Piece @ Arcane Workshop 3.7.26' },
-  { id: 'erUODxg8MMA', t: 'Twin Stacks @ The End 3.1.26' },
-  { id: 'qUOs3Z9fs-s', t: 'Gorge @ Arcane Workshop 2.25.26' },
-  { id: 'Bu5j1aQ4Ef0', t: 'Joint Funeral @ Inglewood Lounge 2.16.26' },
-  { id: 'vPRae0PQXYU', t: 'Aim Down Sight @ Tempo 2.12.26' },
-  { id: 'LoTFRJT5K28', t: 'On The Brink @ Tempo 2.12.26' },
-  { id: 'JkeNIDGbY-E', t: 'Dogpile @ Tempo 2.12.26' },
-  { id: 'DoOQXBTMJJo', t: 'Lethal Method @ drkmttr 2.11.26' },
-  { id: 'CuYYoeYlTkk', t: 'Gorge @ Vinyl Lounge 2.7.26' },
-  { id: 'XlDJ7waGSz8', t: 'Die Trying @ drkmttr 2.6.26' },
-  { id: 'c7554e-6Mb8', t: "Finda Brita @ Mean Mel's, Cookeville 1.30.26" },
-  { id: 'sb7rnjRN11o', t: 'Gorge @ Tempo 2.1.26' },
-  { id: 'ui8kzz2tsfc', t: 'Grow Blind @ Fuchsia Fest 2024' },
-  { id: 'vF5BGMDSIVo', t: 'Fuchsia Fest 2024' },
-  { id: 'Wc8bc2zCr3s', t: 'Gorge @ Eastside Bowl 12.13.25' },
-  { id: 'Nvyj1OPNoe4', t: 'Better Off @ The End 12.2.23' },
-  { id: 'YI8X5uC8ahs', t: 'Lethal Method @ Vinyl Lounge 10.25.25' },
-  { id: 'Q-ufICWUZv0', t: 'Twin Stacks @ Arcane Workshop 9.15.24' },
-  { id: 'ikxVoh8i8Ko', t: 'Orthodox @ The Basement 6.20.25' },
-  { id: 'gWmQ9sLVOao', t: 'Idiot @ Arcane Workshop 4.11.24' },
-  { id: 'XKl-r_H8ePk', t: 'Blemish @ Arcane Workshop 11.30.25' },
-  { id: 'aZYJ_qXDs78', t: 'Hushhh @ The Cowan 1.11.24' },
-  { id: '-b6Ju8Z2wr8', t: 'Better Off @ The End 6.22.24' },
-  { id: 'CxaCNZtBsZw', t: 'On The Brink @ Arcane Workshop 7.12.25' },
-  { id: 'UjnUp4obxXE', t: 'Lethal Method @ The End 12.17.23' },
-  { id: 'hwX-5XjiPLA', t: 'Thirty Nights @ drkmttr 3.31.24' }
+  { id: '4iWGxePe2NA', t: 'Keep the Piece @ Arcane Workshop 3.7.26', ch: 2 },
+  { id: 'erUODxg8MMA', t: 'Twin Stacks @ The End 3.1.26', ch: 5 },
+  { id: 'qUOs3Z9fs-s', t: 'Gorge @ Arcane Workshop 2.25.26', ch: 8 },
+  { id: 'Bu5j1aQ4Ef0', t: 'Joint Funeral @ Inglewood Lounge 2.16.26', ch: 11 },
+  { id: 'vPRae0PQXYU', t: 'Aim Down Sight @ Tempo 2.12.26', ch: 14 },
+  { id: 'LoTFRJT5K28', t: 'On The Brink @ Tempo 2.12.26', ch: 17 },
+  { id: 'JkeNIDGbY-E', t: 'Dogpile @ Tempo 2.12.26', ch: 20 },
+  { id: 'DoOQXBTMJJo', t: 'Lethal Method @ drkmttr 2.11.26', ch: 23 },
+  { id: 'CuYYoeYlTkk', t: 'Gorge @ Vinyl Lounge 2.7.26', ch: 26 },
+  { id: 'XlDJ7waGSz8', t: 'Die Trying @ drkmttr 2.6.26', ch: 29 },
+  { id: 'c7554e-6Mb8', t: "Finda Brita @ Mean Mel's, Cookeville 1.30.26", ch: 32 },
+  { id: 'sb7rnjRN11o', t: 'Gorge @ Tempo 2.1.26', ch: 35 },
+  { id: 'ui8kzz2tsfc', t: 'Grow Blind @ Fuchsia Fest 2024', ch: 38 },
+  { id: 'vF5BGMDSIVo', t: 'Fuchsia Fest 2024', ch: 41 },
+  { id: 'Wc8bc2zCr3s', t: 'Gorge @ Eastside Bowl 12.13.25', ch: 44 },
+  { id: 'Nvyj1OPNoe4', t: 'Better Off @ The End 12.2.23', ch: 47 },
+  { id: 'YI8X5uC8ahs', t: 'Lethal Method @ Vinyl Lounge 10.25.25', ch: 50 },
+  { id: 'Q-ufICWUZv0', t: 'Twin Stacks @ Arcane Workshop 9.15.24', ch: 53 },
+  { id: 'ikxVoh8i8Ko', t: 'Orthodox @ The Basement 6.20.25', ch: 56 },
+  { id: 'gWmQ9sLVOao', t: 'Idiot @ Arcane Workshop 4.11.24', ch: 59 },
+  { id: 'XKl-r_H8ePk', t: 'Blemish @ Arcane Workshop 11.30.25', ch: 62 },
+  { id: 'aZYJ_qXDs78', t: 'Hushhh @ The Cowan 1.11.24', ch: 65 },
+  { id: '-b6Ju8Z2wr8', t: 'Better Off @ The End 6.22.24', ch: 68 },
+  { id: 'CxaCNZtBsZw', t: 'On The Brink @ Arcane Workshop 7.12.25', ch: 71 },
+  { id: 'UjnUp4obxXE', t: 'Lethal Method @ The End 12.17.23', ch: 74 },
+  { id: 'hwX-5XjiPLA', t: 'Thirty Nights @ drkmttr 3.31.24', ch: 77 }
 ];
 
 var cat = 'all';
@@ -837,12 +871,15 @@ function doFlash() {
   el.classList.add('go');
 }
 
-function showCh() {
+function showCh(v) {
   var d = document.getElementById('chDisp');
-  document.getElementById('chNum').textContent = String(idx + 1).padStart(2, '0');
+  var np = document.querySelector('.now-playing');
+  var chNum = v && v.ch ? v.ch : (idx + 1);
+  document.getElementById('chNum').textContent = String(chNum).padStart(2, '0');
   d.classList.add('show');
+  np.classList.add('show');
   clearTimeout(chTimer);
-  chTimer = setTimeout(function() { d.classList.remove('show'); }, 3000);
+  chTimer = setTimeout(function() { d.classList.remove('show'); np.classList.remove('show'); }, 3000);
 }
 
 function loadVideo(i) {
@@ -852,7 +889,7 @@ function loadVideo(i) {
   doFlash();
   player.loadVideoById({ videoId: v.id });
   document.getElementById('npTitle').textContent = v.t;
-  showCh();
+  showCh(v);
 }
 
 function nextCh() { loadVideo(idx + 1); }
@@ -896,7 +933,7 @@ function onYouTubeIframeAPIReady() {
       onReady: function(event) {
         playerReady = true;
         document.getElementById('npTitle').textContent = firstVid.t;
-        showCh();
+        showCh(firstVid);
 
         event.target.mute();
         event.target.playVideo();
@@ -947,10 +984,26 @@ document.getElementById('playOverlay').addEventListener('click', function() {
   }
 });
 
+// Mobile unmute button
+document.getElementById('bUnmute').addEventListener('click', function() {
+  if (playerReady && player) {
+    player.unMute();
+    this.classList.add('hidden');
+  }
+});
+
+// Unmute on first user interaction anywhere
+document.addEventListener('click', function unmute() {
+  if (playerReady && player) {
+    player.unMute();
+    document.removeEventListener('click', unmute);
+  }
+}, { once: false });
+
 // Remote buttons
 document.getElementById('bPrev').addEventListener('click', function() { prevCh(); });
 document.getElementById('bNext').addEventListener('click', function() { nextCh(); });
-// Shuffle always on
+document.getElementById('bShuf').addEventListener('click', function() { togShuf(); });
 document.getElementById('bMusic').addEventListener('click', function() { setCat('music'); });
 document.getElementById('bLive').addEventListener('click', function() { setCat('live'); });
 document.getElementById('bAll').addEventListener('click', function() { setCat('all'); });
@@ -977,7 +1030,7 @@ setBg();
 // Animated tiling grain — pre-generate SVG frames as data URIs
 var grainFrames = [];
 for (var g = 0; g < 6; g++) {
-  grainFrames.push("url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' seed='" + g + "' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")");
+  grainFrames.push("url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' seed='" + g + "' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E\")");
 }
 var grainIdx = 0;
 var grainDiv = document.getElementById('bgGrain');
