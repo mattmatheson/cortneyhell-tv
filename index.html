@@ -8,9 +8,10 @@
   @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { overflow-y: scroll; overscroll-behavior: none; }
 
   body {
-    background: #c8c5be;
+    background: #111;
     color: #5a5850;
     font-family: 'Space Mono', monospace;
     min-height: 100vh;
@@ -21,47 +22,46 @@
     padding: 40px 20px 80px;
   }
 
+  .bg-image {
+    position: fixed;
+    top: -10%; left: -10%;
+    width: 120%; height: 120%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    animation: bgSway 30s ease-in-out infinite alternate;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  @keyframes bgSway {
+    0% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(2%, -1.5%) scale(1.02); }
+    50% { transform: translate(-1.5%, 2%) scale(1.01); }
+    75% { transform: translate(1%, 1.5%) scale(1.03); }
+    100% { transform: translate(-2%, -1%) scale(1); }
+  }
+
   body::before {
     content: '';
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background:
-      radial-gradient(ellipse 60% 25% at 50% 0%, rgba(220, 225, 210, 0.6) 0%, transparent 100%),
-      radial-gradient(ellipse 40% 20% at 35% 5%, rgba(215, 220, 205, 0.3) 0%, transparent 100%),
-      linear-gradient(180deg,
-        #d0cdc5 0%,
-        #ccc9c1 30%,
-        #c8c5bd 50%,
-        #c2bfb7 70%,
-        #bbb8b0 100%
-      );
+    background: rgba(0,0,0,0.15);
     z-index: 0;
   }
 
-  body::after {
-    content: '';
+  .bg-grain {
     position: fixed;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     z-index: 0;
     pointer-events: none;
-    animation: grain 8s steps(10) infinite;
+    mix-blend-mode: overlay;
+    background-repeat: repeat;
+    background-size: 256px 256px;
   }
 
-  @keyframes grain {
-    0%, 100% { transform: translate(0, 0); }
-    10% { transform: translate(-5%, -10%); }
-    20% { transform: translate(-15%, 5%); }
-    30% { transform: translate(7%, -25%); }
-    40% { transform: translate(-5%, 25%); }
-    50% { transform: translate(-15%, 10%); }
-    60% { transform: translate(15%, 0%); }
-    70% { transform: translate(0%, 15%); }
-    80% { transform: translate(3%, 35%); }
-    90% { transform: translate(-10%, 10%); }
-  }
 
   .vignette {
     position: fixed;
@@ -198,64 +198,82 @@
     text-transform: uppercase;
   }
 
-  /* Buttons */
-  .remote {
-    margin-top: -18px;
+  /* Prev/Next flanking the TV */
+  .tv-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tv-nav:hover { color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+  .tv-nav:active { transform: translateY(-50%) scale(0.9); }
+
+  .tv-nav svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .tv-nav-prev { left: -18px; }
+  .tv-nav-next { right: -18px; }
+
+  /* Filter controls under TV */
+  .controls {
+    margin-top: -70px;
     width: min(70vw, 580px);
     z-index: 1;
     position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 5px;
-  }
-
-  .remote-row {
-    display: flex;
-    gap: 4px;
     justify-content: center;
+    gap: 4px;
   }
 
-  .btn {
+  .ctrl-btn {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.5rem;
-    font-weight: 600;
-    padding: 7px 14px;
-    letter-spacing: 0.35em;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    letter-spacing: 0.1em;
     background: transparent;
-    color: #999;
-    border: 1px solid rgba(0,0,0,0.06);
-    border-radius: 2px;
+    color: rgba(255,255,255,0.5);
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.15s;
-    letter-spacing: 0.08em;
     text-transform: uppercase;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
   }
 
-  .btn:hover {
-    color: #555;
-    border-color: rgba(0,0,0,0.12);
-    background: rgba(0,0,0,0.02);
+  .ctrl-btn:hover {
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.08);
   }
 
-  .btn-icon {
-    padding: 10px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
+  .ctrl-btn:active { transform: scale(0.95); }
+
+  .ctrl-btn.on {
+    color: rgba(255,255,255,0.8);
   }
 
-  .btn:active { transform: scale(0.97); }
-
-  .btn.on {
-    color: #444;
-    border-color: rgba(0,0,0,0.12);
-    background: rgba(0,0,0,0.03);
+  .ctrl-div {
+    width: 1px;
+    height: 12px;
+    background: rgba(255,255,255,0.2);
   }
 
   /* Content container — left-aligned block */
@@ -271,11 +289,12 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: clamp(1.4rem, 3vw, 2rem);
     font-weight: 400;
-    color: rgba(0,0,0,0.3);
+    color: rgba(255,255,255,0.7);
     letter-spacing: 0.12em;
     text-transform: lowercase;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.3);
     margin-top: 40px;
-    margin-bottom: 6px;
+    margin-bottom: -54px;
     text-align: left;
     z-index: 1;
     position: relative;
@@ -303,14 +322,15 @@
   .ftr {
     width: min(70vw, 500px);
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 24px;
     margin-top: 60px;
     padding: 20px 0;
     border-top: 1px solid rgba(0,0,0,0.06);
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.5rem;
-    font-weight: 600;
-    color: rgba(0,0,0,0.15);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.4);
     letter-spacing: 0.35em;
     text-transform: uppercase;
     z-index: 1;
@@ -318,12 +338,12 @@
   }
 
   .ftr a {
-    color: rgba(0,0,0,0.15);
+    color: rgba(255,255,255,0.9);
     text-decoration: none;
     transition: color 0.2s;
   }
 
-  .ftr a:hover { color: rgba(0,0,0,0.35); }
+  .ftr a:hover { color: rgba(255,255,255,0.6); }
 
   .ftr-left, .ftr-right {
     display: flex;
@@ -403,9 +423,9 @@
 
   .book-title {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.6rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    color: rgba(0,0,0,0.25);
+    color: rgba(0,0,0,0.4);
     letter-spacing: 0.5em;
     text-transform: uppercase;
     margin-bottom: 20px;
@@ -437,8 +457,8 @@
 
   .book-input, .book-select, .book-textarea {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.7rem;
-    font-weight: 400;
+    font-size: 16px;
+    font-weight: 500;
     padding: 12px 14px;
     background: rgba(255,255,255,0.6);
     color: #333;
@@ -469,6 +489,45 @@
     cursor: pointer;
   }
 
+  .book-input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-height: 48px;
+    line-height: normal;
+    color: transparent;
+  }
+
+  .book-input[type="date"]:valid,
+  .book-input[type="date"]:focus {
+    color: #333;
+  }
+
+  .date-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .date-wrap .book-input { width: 100%; }
+
+  .date-label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    color: rgba(0,0,0,0.25);
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+
+  .book-input[type="date"]:focus + .date-label,
+  .book-input[type="date"]:valid + .date-label {
+    opacity: 0;
+  }
+
   .book-textarea {
     resize: vertical;
     min-height: 70px;
@@ -476,12 +535,12 @@
 
   .book-submit {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
     padding: 12px 0;
     letter-spacing: 0.15em;
-    background: rgba(0,0,0,0.06);
-    color: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.08);
+    color: rgba(0,0,0,0.5);
     border: 1px solid rgba(0,0,0,0.08);
     border-radius: 8px;
     cursor: pointer;
@@ -512,7 +571,10 @@
   .book-sent.show { display: block; }
 
   @media (max-width: 700px) {
-    .book-section { width: 90vw; padding: 20px 20px; }
+    .book-section { width: 90vw; padding: 16px 16px; }
+    .book-form { gap: 8px; }
+    .book-input, .book-select, .book-textarea { font-size: 16px; padding: 10px 12px; }
+    .book-submit { font-size: 0.75rem; padding: 10px 0; }
     .book-row { flex-direction: column; }
     .book-row-inline { flex-direction: column; }
   }
@@ -592,19 +654,25 @@
 
   @media (max-width: 700px) {
     .tv-image { width: 90vw; }
-    .remote { width: 90vw; padding: 16px 16px 14px; }
-    .btn { font-size: 0.55rem; }
+    .controls { width: 90vw; margin-top: -30px; }
+    .hdr { margin-bottom: -20px; }
+    .ftr-right { display: none; }
+    .tv-nav-prev { left: -10px; }
+    .tv-nav-next { right: -10px; }
+    .tv-nav svg { width: 22px; height: 22px; }
     body { padding: 24px 12px; }
   }
 
   @media (max-width: 400px) {
     .tv-image { width: 96vw; }
-    .remote { width: 96vw; }
+    .controls { width: 96vw; }
   }
 </style>
 </head>
 <body>
 
+<div class="bg-image" id="bgImage"></div>
+<div class="bg-grain" id="bgGrain"></div>
 <div class="vignette"></div>
 
 <div class="hdr">cortney<span>hell</span>.tv</div>
@@ -633,19 +701,16 @@
     <!-- Hidden clickable buttons on the TV itself -->
     <button class="tv-btn tv-btn-chdn" id="tvChDn" title="CH-"></button>
     <button class="tv-btn tv-btn-chup" id="tvChUp" title="CH+"></button>
+    <button class="tv-nav tv-nav-prev" id="bPrev" title="Previous"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+    <button class="tv-nav tv-nav-next" id="bNext" title="Next"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
   </div>
 
-  <div class="remote">
-    <div class="remote-row">
-      <button class="btn btn-icon" id="bPrev" title="Previous"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-      <button class="btn btn-icon on" id="bShuf" title="Shuffle"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
-      <button class="btn btn-icon" id="bNext" title="Next"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
-    </div>
-    <div class="remote-row">
-      <button class="btn" id="bMusic">music videos</button>
-      <button class="btn" id="bLive">live sets</button>
-      <button class="btn on" id="bAll">all</button>
-    </div>
+  <div class="controls">
+    <button class="ctrl-btn" id="bMusic">music</button>
+    <span class="ctrl-div"></span>
+    <button class="ctrl-btn" id="bLive">live</button>
+    <span class="ctrl-div"></span>
+    <button class="ctrl-btn on" id="bAll">all</button>
   </div>
 </div>
 
@@ -658,7 +723,7 @@
     <input class="book-input" type="tel" name="phone" placeholder="phone" required>
     <div class="book-row-inline">
       <select class="book-select" name="type" required>
-        <option value="" disabled selected>what do you need?</option>
+        <option value="" disabled selected>what's on the menu</option>
         <option value="live-full">$250 — live set / full set</option>
         <option value="live-three">$150 — live set / three songs</option>
         <option value="live-highlight">$200 — live set / highlight montage</option>
@@ -666,7 +731,10 @@
         <option value="promo">$300 — promo / content</option>
         <option value="other">other — let's talk</option>
       </select>
-      <input class="book-input" type="date" name="date" required>
+      <div class="date-wrap">
+        <input class="book-input" type="date" name="date" required>
+        <span class="date-label">date</span>
+      </div>
     </div>
     <input class="book-input" type="text" name="venue" placeholder="venue" required>
     <textarea class="book-textarea" name="details" placeholder="tell me about it — set times, vibe, anything else"></textarea>
@@ -677,10 +745,9 @@
 
 <div class="ftr">
   <div class="ftr-left">
-    <a href="https://youtube.com/@cortneyhell" target="_blank">youtube</a>
-    <a href="https://instagram.com/cortneyhell" target="_blank">instagram</a>
+    <a href="https://youtube.com/@cortneyhell" target="_blank" title="YouTube"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+    <a href="https://instagram.com/cortneyhell" target="_blank" title="Instagram"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg></a>
   </div>
-  <div class="ftr-right">nashville, tn</div>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -793,7 +860,8 @@ function prevCh() { loadVideo(idx - 1); }
 
 function togShuf() {
   shuf = !shuf;
-  document.getElementById('bShuf').classList.toggle('on', shuf);
+  var shufBtn = document.getElementById('bShuf');
+  if (shufBtn) shufBtn.classList.toggle('on', shuf);
   buildList();
   idx = 0;
   loadVideo(0);
@@ -816,7 +884,7 @@ function onYouTubeIframeAPIReady() {
   player = new YT.Player('ytplayer', {
     videoId: firstVid.id,
     playerVars: {
-      autoplay: 0,
+      autoplay: 1,
       mute: 1,
       playsinline: 1,
       controls: 1,
@@ -833,11 +901,17 @@ function onYouTubeIframeAPIReady() {
         event.target.mute();
         event.target.playVideo();
 
+        // Retry autoplay once after a delay
         setTimeout(function() {
-          var state = player.getPlayerState();
-          if (state === 1) {
-            document.getElementById('playOverlay').classList.add('hidden');
-            started = true;
+          if (!started && playerReady) {
+            var state = player.getPlayerState();
+            if (state === 1) {
+              document.getElementById('playOverlay').classList.add('hidden');
+              started = true;
+            } else {
+              player.mute();
+              player.playVideo();
+            }
           }
         }, 1500);
       },
@@ -853,18 +927,30 @@ function onYouTubeIframeAPIReady() {
 }
 
 document.getElementById('playOverlay').addEventListener('click', function() {
+  var overlay = this;
   if (playerReady) {
     player.unMute();
     player.playVideo();
-    this.classList.add('hidden');
+    overlay.classList.add('hidden');
     started = true;
+  } else {
+    // Player not ready yet — wait for it
+    var waitReady = setInterval(function() {
+      if (playerReady) {
+        clearInterval(waitReady);
+        player.unMute();
+        player.playVideo();
+        overlay.classList.add('hidden');
+        started = true;
+      }
+    }, 300);
   }
 });
 
 // Remote buttons
 document.getElementById('bPrev').addEventListener('click', function() { prevCh(); });
 document.getElementById('bNext').addEventListener('click', function() { nextCh(); });
-document.getElementById('bShuf').addEventListener('click', function() { togShuf(); });
+// Shuffle always on
 document.getElementById('bMusic').addEventListener('click', function() { setCat('music'); });
 document.getElementById('bLive').addEventListener('click', function() { setCat('live'); });
 document.getElementById('bAll').addEventListener('click', function() { setCat('all'); });
@@ -879,6 +965,27 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowLeft' || e.key === 'p') prevCh();
   if (e.key === 's') togShuf();
 });
+
+// Background shuffle — add more images to this array
+var bgImages = ['bg-butterflies.webp', 'bg-blue-arch.jpg', 'bg-blue-beams.jpg'];
+var bgIdx = Math.floor(Math.random() * bgImages.length);
+function setBg() {
+  document.getElementById('bgImage').style.backgroundImage = 'url(' + bgImages[bgIdx] + ')';
+}
+setBg();
+
+// Animated tiling grain — pre-generate SVG frames as data URIs
+var grainFrames = [];
+for (var g = 0; g < 6; g++) {
+  grainFrames.push("url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' seed='" + g + "' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E\")");
+}
+var grainIdx = 0;
+var grainDiv = document.getElementById('bgGrain');
+grainDiv.style.backgroundImage = grainFrames[0];
+setInterval(function() {
+  grainIdx = (grainIdx + 1) % grainFrames.length;
+  grainDiv.style.backgroundImage = grainFrames[grainIdx];
+}, 100);
 
 // Booking form
 document.getElementById('bookForm').addEventListener('submit', function(e) {
